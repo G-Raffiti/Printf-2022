@@ -1,0 +1,106 @@
+______________________________________________________________________________________________________
+
+va_list -> type de variables permettant de stocker un nombre de paramètres
+initialiser comme une variable normale
+
+attribuer les args avec :	va_args(variable_Va_list (qu'on vient de créer), dernier_param_connu)
+
+_____________________________________________
+
+#include <stdarg.h>
+
+	type va_arg(va_list arg_ptr, type);
+
+	void va_copy(va_list dest, va_list src);
+
+	void va_end(va_list arg_ptr);
+
+	void va_start(va_list arg_ptr, prev_param);
+
+_____________________________________________
+
+ex :
+
+ va_list marker;
+    va_list copy;
+
+    va_start(marker, first);     /* Initialize variable arguments. */
+    va_copy(copy, marker);       /* Copy list for the second pass */
+
+_____________________________________________
+
+ex :
+
+{
+    va_list argptr;
+    va_start(argptr, i);
+
+    if (i == 0)
+    {
+        int n = va_arg(argptr, int);
+        printf("%d\n", n);
+    }
+    else
+    {
+        char *s = va_arg(argptr, char*);
+        printf("%s\n", s);
+    }
+
+    va_end(argptr);
+}
+
+_____________________________________________
+
+
+	int (*func_array[10])(int, int);
+
+Pour déclarer un pointeur sur fonction dans un programme, vous devez d'abord définir la fonction à laquelle le pointeur va être assigné.
+Par exemple, si nous avons une fonction qui prend deux entiers en entrée et retourne un entier, nous pouvons la définir comme suit:
+
+	int func(int a, int b) {
+		return a + b;
+	}
+
+Pour déclarer un pointeur sur cette fonction, nous devons utiliser le type de retour de la fonction (int dans ce cas) et la déclaration
+de paramètres entre parenthèses. Nous devons également ajouter un astérisque (*) avant le nom du pointeur:
+
+	int (*ptr)(int, int);
+
+_____________________________________________
+
+Utilité des pointeurs sur fonction :
+
+Dans ce code, nous avons défini deux fonctions addition et soustraction qui prennent deux entiers en entrée et renvoient leur somme
+ou leur différence. Nous avons également défini un type mathFunc qui est un pointeur sur une fonction qui prend deux entiers en entrée
+et renvoie un entier. La fonction operation prend deux entiers et un pointeur sur fonction en entrée et appelle ce dernier en lui passant
+les deux premiers arguments. Enfin, dans la fonction main, nous définissons un pointeur sur fonction f qui pointe vers la fonction addition,
+puis nous utilisons ce pointeur pour appeler la fonction operation avec x et y en tant qu'arguments.
+
+#include <iostream>
+
+// Déclaration de fonction
+int addition(int a, int b) {
+   return a + b;
+}
+
+int soustraction(int a, int b) {
+   return a - b;
+}
+
+// Déclaration d'un pointeur sur fonction
+typedef int (*mathFunc)(int, int);
+
+int operation(int a, int b, mathFunc f) {
+   return f(a, b);
+}
+
+int main() {
+   int x = 5, y = 3;
+   mathFunc f = addition;
+   std::cout << "Addition : " << operation(x, y, f) << std::endl;
+   f = soustraction;
+   std::cout << "Soustraction : " << operation(x, y, f) << std::endl;
+   return 0;
+}
+
+_____________________________________________

@@ -1,0 +1,47 @@
+
+					Liste de bonus :
+
+•Gérez toute combinaison des drapeaux suivants : ’-0.’ ainsi que la largeur mini-
+male du champ avec toutes les conversions.
+
+•Gérez tous les drapeaux suivants : ’# +’ (Oui, l’espace est un drapeau valide)
+
+______________________________________________________________________________________________________
+
+Nom du programme	 : 	libftprintf.a
+
+				int ft_printf(const char *, ...)
+
+•%c Affiche un seul caractère.
+•%s Affiche une chaîne de caractères (telle que définie par la convention C).
+•%p L’argument de pointeur void * doit être affiché en hexadécimal.
+•%d Affiche un nombre décimal (base 10).
+•%i Affiche un entier en base 10.
+•%u Affiche un nombre décimal non signé (base 10).
+•%x Affiche un nombre en hexadécimal (base 16) avec des lettres minuscules.
+•%X Affiche un nombre en hexadécimal (base 16) avec des lettres majuscules.
+•%% Affiche un signe pourcentage.
+
+cspdiuxX%
+
+malloc, free, write,
+va_start,
+va_arg,
+va_copy,
+va_end
+
+================================ A FAIRE ============================================================
+
+// fonction qui get les arguments, initialise la liste et la copie dans une nouvelle liste
+
+// |_> fonction qui copie la liste initiale dans une nouvelle
+
+_____________________________________________
+
+// putstr
+
+// putchar
+
+// utoa
+
+// itoa_base
