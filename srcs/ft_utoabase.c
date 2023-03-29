@@ -1,6 +1,6 @@
 #include "../includes/libftprintf.h"
 
-static int	utoa_nbrlen(size_t n, int base)
+static size_t	utoa_nbrlen(size_t n, int base)
 {
 	size_t	nlen;
 
@@ -13,14 +13,18 @@ static int	utoa_nbrlen(size_t n, int base)
 	return (nlen);
 }
 
-char		*check_base(int majbase)
+char		*check_base(int majbase, int base)
 {
 	char *str;
 
-	if (majbase == 1)
+	if (majbase == 1 && base == 16)
 	    str = "0123456789ABCDEF";
-    else
+    else if (majbase == 0 && base == 16)
 	    str = "0123456789abcdef";
+	else if (majbase == 0 && base == 10)
+		str = "0123456789";
+	else
+		str = NULL;
 	return (str);
 }
 
@@ -31,13 +35,13 @@ char		*utoa(size_t n, int base, int majbase)
 	size_t  i;
 	char    *strbase;
 
-    strbase = check_base(majbase);
-	if (base < 2 || base > 16)
+    strbase = check_base(majbase, base);
+	if (strbase == NULL)
 		return (NULL);
 	nlen = utoa_nbrlen(n, base);
 	ret = (char *)ft_calloc(nlen + 1, sizeof(char));
 	if (ret == NULL)
-		return (0);
+		return (NULL);
 	if (n == 0)
 		ret[0] = '0';
 	i = nlen - 1;

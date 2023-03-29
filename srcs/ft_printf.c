@@ -34,6 +34,45 @@ t_list	*create_new_node(t_list *lst, char *content, int content_size)
 	return (lst);
 }
 
+char	*get_pointer_str(va_list args, t_list *lst)
+{
+	char *tmp;
+	char *ret;
+	tmp = ft_utoabase((size_t)va_arg(args, void *), 16, 0);
+	ret = ft_strndup("0x", (ft_strlen(tmp) + 3));
+	if (ret == NULL)
+		return (NULL);
+	ft_strlcpy(&(ret[2]), tmp, ft_strlen(tmp));
+	return (ret);
+}
+
+t_list	*formart_args(va_list args, t_list *lst)
+{
+	char *tmp;
+
+	tmp = NULL;
+	if (lst->s[1] == 'c' || lst->s[1] == '%' || lst->s[1] == 's')
+		tmp = va_arg(args, char *);
+	else if (lst->s[1] = 'u')
+		tmp = ft_utoabase(va_arg(args, size_t), 10, 0);
+	else if (lst->s[1] = 'x')
+		tmp = ft_utoabase(va_arg(args, size_t), 16, 0);
+	else if (lst->s[1] = 'X')
+		tmp = ft_utoabase(va_arg(args, size_t), 16, 1);
+	else if (lst->s[1] = 'i')
+		tmp = ft_itoabase(va_arg(args, int), 10, 0);
+	else if (lst->s[1] = 'd')
+		tmp = ft_itoabase(va_arg(args, size_t), 10, 0);
+	else if (lst->s[1] = 'p')
+		tmp = get_pointer_str(args, lst);
+	free(lst->s);
+	if (tmp != NULL)
+		lst->s = ft_strndup(tmp, (ft_strlen(tmp) + 1));
+	else
+		lst->s = NULL;
+	return (lst);
+}
+
 int	fill_and_print(char *str, va_list args, t_list **lst)
 {
 	int	n;
@@ -52,8 +91,9 @@ int	fill_and_print(char *str, va_list args, t_list **lst)
 			return (-1);
 		if (*str == '\0')
 			return (print_str(lst));
-		*lst = format_args(args, (*lst)->next); // a coder, fonction qui gère les formats
-							// et mets l'argument en string dans un nouveau maillon de la liste
+		*lst = format_args(args, *lst);
+		if ((*lst)->s == NULL)
+			return (-1);
 		str += 2;
 		n += 2;
 	}
