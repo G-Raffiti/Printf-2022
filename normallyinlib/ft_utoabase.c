@@ -1,4 +1,4 @@
-#include "../includes/libftprintf.h"
+#include "libftprintf.h"
 
 static size_t	utoa_nbrlen(size_t n, int base)
 {
@@ -28,7 +28,7 @@ char		*check_base(int majbase, int base)
 	return (str);
 }
 
-char		*utoa(size_t n, int base, int majbase)
+char		*ft_utoabase(size_t n, int base, int majbase)
 {
 	char    *ret;
 	size_t  nlen;

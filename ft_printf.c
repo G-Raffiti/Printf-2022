@@ -1,26 +1,37 @@
-#include "../includes/libftprintf.h"
+#include "libftprintf.h"
 
 int count_printed_length(t_list **lst)
 {
-	t_list	*tmp;
 	int		count;
 
-	tmp = *lst;
 	count = 0;
-	while (tmp->next != NULL)
+	while ((*lst)->next != NULL)
 	{
-		count += ft_strlen(tmp->s);
-		tmp = tmp->next;
+		count += ft_strlen((*lst)->s);
+		*lst = (*lst)->next;
 	}
-	count += ft_strlen(tmp->s);
+	count += ft_strlen((*lst)->s);
 	return (count);
 }
 
 int	print_str(t_list **lst)
 {
 	int	n;
+	int i;
+	char *str;
 
 	n = count_printed_length(lst);
+	str = malloc(sizeof(char) * n + 1);
+	if (str == NULL)
+		return (-1);
+	i = 0;
+	while (*lst != NULL)
+	{
+		i += ft_strlcpy(str + i, (*lst)->s, ft_strlen((*lst)->s));
+		*lst = (*lst)->next;
+	}
+	if (i != n)
+		return (i);
 	return (n);
 }
 
@@ -34,7 +45,7 @@ t_list	*create_new_node(t_list *lst, char *content, int content_size)
 	return (lst);
 }
 
-char	*get_pointer_str(va_list args, t_list *lst)
+char	*get_pointer_str(va_list args)
 {
 	char *tmp;
 	char *ret;
@@ -46,25 +57,25 @@ char	*get_pointer_str(va_list args, t_list *lst)
 	return (ret);
 }
 
-t_list	*formart_args(va_list args, t_list *lst)
+t_list	*format_args(va_list args, t_list *lst)
 {
 	char *tmp;
 
 	tmp = NULL;
 	if (lst->s[1] == 'c' || lst->s[1] == '%' || lst->s[1] == 's')
 		tmp = va_arg(args, char *);
-	else if (lst->s[1] = 'u')
+	else if (lst->s[1] == 'u')
 		tmp = ft_utoabase(va_arg(args, size_t), 10, 0);
-	else if (lst->s[1] = 'x')
+	else if (lst->s[1] == 'x')
 		tmp = ft_utoabase(va_arg(args, size_t), 16, 0);
-	else if (lst->s[1] = 'X')
+	else if (lst->s[1] == 'X')
 		tmp = ft_utoabase(va_arg(args, size_t), 16, 1);
-	else if (lst->s[1] = 'i')
-		tmp = ft_itoabase(va_arg(args, int), 10, 0);
-	else if (lst->s[1] = 'd')
-		tmp = ft_itoabase(va_arg(args, size_t), 10, 0);
-	else if (lst->s[1] = 'p')
-		tmp = get_pointer_str(args, lst);
+	else if (lst->s[1] == 'i')
+		tmp = ft_itoabase(va_arg(args, int), 10);
+	else if (lst->s[1] == 'd')
+		tmp = ft_itoabase(va_arg(args, size_t), 10);
+	else if (lst->s[1] == 'p')
+		tmp = get_pointer_str(args);
 	free(lst->s);
 	if (tmp != NULL)
 		lst->s = ft_strndup(tmp, (ft_strlen(tmp) + 1));
@@ -97,7 +108,7 @@ int	fill_and_print(char *str, va_list args, t_list **lst)
 		str += 2;
 		n += 2;
 	}
-	return (print_str(lst)); // a coder, fonction qui met la liste en string et qui l'affiche
+	return (print_str(lst));
 }
 
 int	write_and_get_written_nb(char *str, va_list args)
@@ -108,9 +119,8 @@ int	write_and_get_written_nb(char *str, va_list args)
 	lst = malloc(sizeof(t_list *) + 1);
 	if (!lst)
 		return (-1);
-	written = fill_and_print(str, args, *lst);
-	// check error return
-	free(lst); // faire fonction qui free toute la liste
+	written = fill_and_print(str, args, lst);
+	ft_lstfree(lst);
 	return (written);
 }
 
@@ -125,8 +135,7 @@ int	ft_printf(const char *str, ...)
 		return (0);
 	// error check in str
 	va_start(args, str);
-	written = write_and_get_written_nb(str, args);
-	// error check
+	written = write_and_get_written_nb((char *)str, args);
 	va_end(args);
 	return (written);
 }

@@ -1,13 +1,13 @@
-#include "../includes/libftprintf.h"
+#include "libftprintf.h"
 
 char	*ft_strndup(const char *s, int n)
 {
-	size_t	i;
+	int		i;
 	char	*str;
 
 	i = 0;
 	str = malloc(sizeof(char) * n);
-	if (str = NULL)
+	if (str == NULL)
 		return (NULL);
 	while (i < n)
 	{

@@ -1,4 +1,4 @@
-#include "../includes/libftprintf.h"
+#include "libftprintf.h"
 
 size_t	ft_strlcpy(char *dst, const char *src, size_t size)
 {

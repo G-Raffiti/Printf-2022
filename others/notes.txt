@@ -1,8 +1,6 @@
 
 ================================ A FAIRE ============================================================
 
-// fonction qui affiche toute la liste
-
-// fonction qui free toute la liste
-
-// gestion d'erreurs
+// gestion d'erreurs in str
+// makefile with lib
+// cut the file in severals
