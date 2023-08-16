@@ -7,10 +7,10 @@ int count_printed_length(t_list **lst)
 	count = 0;
 	while ((*lst)->next != NULL)
 	{
-		count += ft_strlen((*lst)->s);
+		count += ft_strlen((*lst)->content);
 		*lst = (*lst)->next;
 	}
-	count += ft_strlen((*lst)->s);
+	count += ft_strlen((*lst)->content);
 	return (count);
 }
 
@@ -27,7 +27,7 @@ int	print_str(t_list **lst)
 	i = 0;
 	while (*lst != NULL)
 	{
-		i += ft_strlcpy(str + i, (*lst)->s, ft_strlen((*lst)->s));
+		i += ft_strlcpy(str + i, (*lst)->content, ft_strlen((*lst)->content));
 		*lst = (*lst)->next;
 	}
 	if (i != n)
@@ -40,7 +40,7 @@ t_list	*create_new_node(t_list *lst, char *content, int content_size)
 	lst = malloc(sizeof(t_list));
 	if (!lst)
 		return (NULL);
-	lst->s = ft_strndup(content, content_size);
+	lst->content = ft_strndup(content, content_size);
 	lst->next = NULL;
 	return (lst);
 }
@@ -62,25 +62,25 @@ t_list	*format_args(va_list args, t_list *lst)
 	char *tmp;
 
 	tmp = NULL;
-	if (lst->s[1] == 'c' || lst->s[1] == '%' || lst->s[1] == 's')
+	if (lst->content[1] == 'c' || lst->content[1] == '%' || lst->content[1] == 's')
 		tmp = va_arg(args, char *);
-	else if (lst->s[1] == 'u')
+	else if (lst->content[1] == 'u')
 		tmp = ft_utoabase(va_arg(args, size_t), 10, 0);
-	else if (lst->s[1] == 'x')
+	else if (lst->content[1] == 'x')
 		tmp = ft_utoabase(va_arg(args, size_t), 16, 0);
-	else if (lst->s[1] == 'X')
+	else if (lst->content[1] == 'X')
 		tmp = ft_utoabase(va_arg(args, size_t), 16, 1);
-	else if (lst->s[1] == 'i')
+	else if (lst->content[1] == 'i')
 		tmp = ft_itoabase(va_arg(args, int), 10);
-	else if (lst->s[1] == 'd')
+	else if (lst->content[1] == 'd')
 		tmp = ft_itoabase(va_arg(args, size_t), 10);
-	else if (lst->s[1] == 'p')
+	else if (lst->content[1] == 'p')
 		tmp = get_pointer_str(args);
-	free(lst->s);
+	free(lst->content);
 	if (tmp != NULL)
-		lst->s = ft_strndup(tmp, (ft_strlen(tmp) + 1));
+		lst->content = ft_strndup(tmp, (ft_strlen(tmp) + 1));
 	else
-		lst->s = NULL;
+		lst->content = NULL;
 	return (lst);
 }
 
@@ -98,12 +98,12 @@ int	fill_and_print(char *str, va_list args, t_list **lst)
 		while (*str != '%' && *str++)
 			n++;
 		*lst = create_new_node(*lst, str + i, n);
-		if (!(*lst) || !(*lst)->s)
+		if (!(*lst) || !(*lst)->content)
 			return (-1);
 		if (*str == '\0')
 			return (print_str(lst));
 		*lst = format_args(args, *lst);
-		if ((*lst)->s == NULL)
+		if ((*lst)->content == NULL)
 			return (-1);
 		str += 2;
 		n += 2;

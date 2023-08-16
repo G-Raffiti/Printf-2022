@@ -1,6 +1,0 @@
-
-================================ A FAIRE ============================================================
-
-// gestion d'erreurs in str
-// makefile with lib
-// cut the file in severals
