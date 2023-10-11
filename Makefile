@@ -3,7 +3,7 @@
 NAME = libftprintf.a
 CC = gcc
 CC_FLAGS = -Wall -Wextra -Werror
-SRCS = ft_printf.c
+SRCS = ft_printf.c ft_printf_tools.c
 OBJS = $(SRCS:.c=.o)
 INC = libftprintf.h
 INCLIBFT = libft/libft.h

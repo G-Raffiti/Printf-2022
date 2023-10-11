@@ -1,71 +1,27 @@
 #include "libftprintf.h"
 
-int	count_length_to_print(t_list *lst)
-{
-	t_list	*tmp;
-	int		count;
-
-	tmp = lst;
-	count = 0;
-	while (tmp != NULL)
-	{
-		count += ft_strlen(tmp->content);
-		tmp = tmp ->next;
-	}
-	return (count);
-}
-
 int	print_str(t_list *lst)
 {
 	t_list	*tmp;
 	int		len_str;
 	int		len_to_add;
 	char	*str_to_print;
-	int		tmplen;
 
 	tmp = lst;
 	len_str = count_length_to_print(lst);
-	if (len_str == 0)
-		return (-1);
 	str_to_print = malloc(sizeof(char) * len_str + 1);
 	if (str_to_print == NULL)
 		return (-1);
 	len_to_add = 0;
 	while (tmp)
 	{
-		tmplen = ft_strlen(tmp->content);
-		ft_strlcpy(&str_to_print[len_to_add], tmp->content, ((size_t)(tmplen + 1)));
-		len_to_add += tmplen;
+		ft_strlcpy(&str_to_print[len_to_add], tmp->content, (ft_strlen(tmp->content) + 1));
+		len_to_add += ft_strlen(tmp->content);
 		tmp = tmp ->next;
 	}
 	ft_putstr_fd(str_to_print, 1);
+	free(str_to_print);
 	return (len_to_add);
-}
-
-char	*get_pointer_str(va_list args)
-{
-	char	*tmp;
-	char	*ret;
-
-	tmp = ft_utoabase((size_t)va_arg(args, void *), 16, 0);
-	ret = ft_strndup("0x", (ft_strlen(tmp) + 3));
-	if (ret == NULL)
-		return (NULL);
-	ft_strlcpy(&(ret[2]), tmp, ft_strlen(tmp) + 1);
-	return (ret);
-}
-
-int	add_new_node(char *str, t_list **lst)
-{
-	t_list	*new_node;
-
-	if (!str)
-		return (-1);
-	new_node = ft_lstnew(str);
-	if (!new_node)
-		return (-1);
-	ft_lstadd_back(lst, new_node);
-	return (0);
 }
 
 char	*args_are_string_or_char(va_list args, char *str)
@@ -74,7 +30,7 @@ char	*args_are_string_or_char(va_list args, char *str)
 	char	c;
 
 	if (str[0] != '%')
-		return (str);
+		return (ft_strndup(str, ft_strlen(str) + 1));
 	if (str[1] == 's')
 	{
 		tmp = va_arg(args, char *);
@@ -110,7 +66,8 @@ char	*format_args(va_list args, char *str)
 	else if (str[1] == 'd')
 		tmp = ft_itoabase(va_arg(args, size_t), 10);
 	else if (str[1] == 'p')
-		tmp = get_pointer_str(args);
+		tmp = get_pointer_adress(args);
+	free(str);
 	return (tmp);
 }
 
@@ -139,17 +96,20 @@ int	fill_list(char *str, va_list args, t_list *lst)
 int	ft_printf(const char *str, ...)
 {
 	va_list args;
-	t_list	*lst;
+	t_list	**lst;
 	int		ret;
 
 	if (!str)
 		return (-1); // make a pretty error message + an exit shit ?
 	if (!(*str))
 		return (0);
-	lst = NULL;
+	lst = malloc(sizeof(t_list **));
+	if (lst == NULL)
+		return (-1);
 	// error check in str
 	va_start(args, str);
-	ret = fill_list((char *)str, args, lst);
+	ret = fill_list((char *)str, args, *lst);
 	va_end(args);
+	ft_lstfree(lst);
 	return (ret);
 }
