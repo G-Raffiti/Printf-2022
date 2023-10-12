@@ -1,93 +1,105 @@
-#include "libftprintf.h"
+#include "ft_printf.h"
 
-int	print_str(t_list *lst)
-{
-	t_list	*tmp;
-	int		len_str;
-	int		len_to_add;
-	char	*str_to_print;
-
-	tmp = lst;
-	len_str = count_length_to_print(lst);
-	str_to_print = malloc(sizeof(char) * len_str + 1);
-	if (str_to_print == NULL)
-		return (-1);
-	len_to_add = 0;
-	while (tmp)
-	{
-		ft_strlcpy(&str_to_print[len_to_add], tmp->content, (ft_strlen(tmp->content) + 1));
-		len_to_add += ft_strlen(tmp->content);
-		tmp = tmp ->next;
-	}
-	ft_putstr_fd(str_to_print, 1);
-	free(str_to_print);
-	return (len_to_add);
-}
-
-char	*args_are_string_or_char(va_list args, char *str)
+char	*get_string_char(va_list args, char *str)
 {
 	char	*tmp;
 	char	c;
+	int		i;
 
 	if (str[0] != '%')
 		return (ft_strndup(str, ft_strlen(str) + 1));
-	if (str[1] == 's')
+	i = 1;
+	while (str[i] == ' ')
+		i++;
+	if (str[i] == 's')
 	{
 		tmp = va_arg(args, char *);
+		if (tmp == NULL)
+			return (ft_strndup("(null)", 6));
 		return (ft_strndup(tmp, ft_strlen(tmp) + 1));
 	}
-	if (str[1] == '%')
+	if (str[i] == '%')
 		c = '%';
-	else if (str[1] == 'c')
+	else if (str[i] == 'c')
 		c = va_arg(args, int);
-	tmp = malloc(sizeof(char) * 2);
-	if (tmp == NULL)
-		return (NULL);
-	tmp[0] = c;
-	tmp[1] = '\0';
-	return (tmp);
+	else
+		return (ft_strndup(&(str[1]), 2));
+	return (char_to_str(c));
 }
 
 char	*format_args(va_list args, char *str)
 {
 	char	*tmp;
+	int		i;
 
 	tmp = NULL;
-	if (str[0] != '%' || str[1] == '%' || str[1] == 'c' || str[1] == 's')
-		tmp = args_are_string_or_char(args, str);
-	else if (str[1] == 'u')
+	i = 1;
+	while (str[i] && str[i] == ' ')
+		i++;
+	if (str[i] == 'u')
 		tmp = ft_utoabase(va_arg(args, unsigned int), 10, 0);
-	else if (str[1] == 'x')
+	else if (str[i] == 'x')
 		tmp = ft_utoabase(va_arg(args, size_t), 16, 0);
-	else if (str[1] == 'X')
+	else if (str[i] == 'X')
 		tmp = ft_utoabase(va_arg(args, size_t), 16, 1);
-	else if (str[1] == 'i')
+	else if (str[i] == 'i')
 		tmp = ft_itoabase(va_arg(args, int), 10);
-	else if (str[1] == 'd')
+	else if (str[i] == 'd')
 		tmp = ft_itoabase(va_arg(args, size_t), 10);
-	else if (str[1] == 'p')
+	else if (str[i] == 'p')
 		tmp = get_pointer_adress(args);
+	if (tmp == NULL)
+		tmp = get_string_char(args, str);
 	free(str);
 	return (tmp);
 }
 
+int	search_format_specifier(char *str)
+{
+	char	*format;
+	int		i;
+	int		n;
+
+	n = 1;
+	format = "cspdiuxX%";
+	while (*(str + n) && *(str + n) == ' ')
+		n++;
+	i = 0;
+	while (format[i] && *(str + n) != format[i])
+		i++;
+	if (format[i] == '\0')
+	{
+		ft_putstr_fd("Error : invalid conversion specifier \'", 2);
+		write(2, &str[n], 1);
+		ft_putstr_fd("\'. Supported ones are \"cspdiuxX%\".", 2);
+		ft_putstr_fd(" Behavior will be undefined.\n", 2);
+		return (-1);
+	}
+	return (n + 1);
+}
+
 int	fill_list(char *str, va_list args, t_list *lst)
 {
-	int		n;
-	int		checker;
+	int	n;
+	int	checker;
 
 	while (*str)
 	{
+		if(*str == '%' && str[1] == '\0')
+			return (0);
 		n = 0;
 		while (*(str + n) != '%' && *(str + n) != '\0')
 			n++;
-		if (n == 0 && *str != '\0')
-			n = 3;
-		checker = add_new_node(format_args(args, ft_strndup(str, n)), &lst);
+		if (n == 0 && *str == '%')
+			n = search_format_specifier(str);
+		if (n == -1)
+		{
+			str++;
+			n = 1;
+		}
+		checker = add_new_node(format_args(args, ft_strndup(str, (size_t)n)), &lst);
 		if (checker == -1)
 			return (-1);
-		if (*str == '%')
-			n--;
 		str += n;
 	}
 	return (print_str(lst));
@@ -95,18 +107,17 @@ int	fill_list(char *str, va_list args, t_list *lst)
 
 int	ft_printf(const char *str, ...)
 {
-	va_list args;
+	va_list	args;
 	t_list	**lst;
 	int		ret;
 
 	if (!str)
-		return (-1); // make a pretty error message + an exit shit ?
+		return (-1);
 	if (!(*str))
 		return (0);
 	lst = malloc(sizeof(t_list **));
 	if (lst == NULL)
 		return (-1);
-	// error check in str
 	va_start(args, str);
 	ret = fill_list((char *)str, args, *lst);
 	va_end(args);

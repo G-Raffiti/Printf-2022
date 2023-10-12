@@ -5,7 +5,7 @@ CC = gcc
 CC_FLAGS = -Wall -Wextra -Werror
 SRCS = ft_printf.c ft_printf_tools.c
 OBJS = $(SRCS:.c=.o)
-INC = libftprintf.h
+INC = ft_printf.h
 INCLIBFT = libft/libft.h
 
 #*****************************************************************************#
