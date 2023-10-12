@@ -2,11 +2,11 @@
 
 NAME = libftprintf.a
 CC = gcc
-CC_FLAGS = -Wall -Wextra -Werror
+CC_FLAGS = -Wall -Wextra -Werror -g
 SRCS = ft_printf.c ft_printf_tools.c
 OBJS = $(SRCS:.c=.o)
 INC = ft_printf.h
-INCLIBFT = libft/libft.h
+INCLIBFT = libft
 
 #*****************************************************************************#
 #                                   Rules                                     #
@@ -37,4 +37,4 @@ $(NAME): libft $(OBJS) $(INC)
 	ar rcs $(NAME) $(OBJS)
 
 %.o: %.c
-	$(CC) $(CC_FLAGS) -o $@ -c $< -I $(INC) -I $(INCLIBFT)
+	$(CC) $(CC_FLAGS) -o $@ -c $< -I ./ -I $(INCLIBFT)

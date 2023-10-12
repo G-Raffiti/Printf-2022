@@ -1,13 +1,14 @@
 #include "ft_printf.h"
 
-int	print_str(t_list *lst)
+int	print_str(t_list **lst)
 {
 	t_list	*tmp;
 	int		len_str;
 	int		len_to_add;
 	char	*str_to_print;
 
-	tmp = lst;
+	tmp = *lst;
+
 
 	len_str = count_length_to_print(lst);
 	str_to_print = malloc(sizeof(char) * len_str + 1);
@@ -25,12 +26,12 @@ int	print_str(t_list *lst)
 	return (len_to_add);
 }
 
-int	count_length_to_print(t_list *lst)
+int	count_length_to_print(t_list **lst)
 {
 	t_list	*tmp;
 	int		count;
 
-	tmp = lst;
+	tmp = *lst;
 	count = 0;
 	while (tmp != NULL)
 	{
@@ -61,7 +62,6 @@ int	add_new_node(char *str, t_list **lst)
 	if (str == NULL)
 		return (-1);
 	new_node = ft_lstnew(str);
-	free(str);
 	if (!new_node)
 		return (-1);
 	ft_lstadd_back(lst, new_node);

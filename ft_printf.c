@@ -27,30 +27,30 @@ char	*get_string_char(va_list args, char *str)
 	return (char_to_str(c));
 }
 
-char	*format_args(va_list args, char *str)
+char	*format_args(va_list args, char *formater)
 {
 	char	*tmp;
 	int		i;
 
 	tmp = NULL;
 	i = 1;
-	while (str[i] && str[i] == ' ')
+	while (formater[i] && formater[i] == ' ')
 		i++;
-	if (str[i] == 'u')
+	if (formater[i] == 'u')
 		tmp = ft_utoabase(va_arg(args, unsigned int), 10, 0);
-	else if (str[i] == 'x')
+	else if (formater[i] == 'x')
 		tmp = ft_utoabase(va_arg(args, size_t), 16, 0);
-	else if (str[i] == 'X')
+	else if (formater[i] == 'X')
 		tmp = ft_utoabase(va_arg(args, size_t), 16, 1);
-	else if (str[i] == 'i')
+	else if (formater[i] == 'i')
 		tmp = ft_itoabase(va_arg(args, int), 10);
-	else if (str[i] == 'd')
+	else if (formater[i] == 'd')
 		tmp = ft_itoabase(va_arg(args, size_t), 10);
-	else if (str[i] == 'p')
+	else if (formater[i] == 'p')
 		tmp = get_pointer_adress(args);
 	if (tmp == NULL)
-		tmp = get_string_char(args, str);
-	free(str);
+		tmp = get_string_char(args, formater);
+	free(formater);
 	return (tmp);
 }
 
@@ -78,10 +78,11 @@ int	search_format_specifier(char *str)
 	return (n + 1);
 }
 
-int	fill_list(char *str, va_list args, t_list *lst)
+int	fill_list(char *str, va_list args, t_list **lst)
 {
-	int	n;
+    int	n;
 	int	checker;
+    char *formater;
 
 	while (*str)
 	{
@@ -97,7 +98,10 @@ int	fill_list(char *str, va_list args, t_list *lst)
 			str++;
 			n = 1;
 		}
-		checker = add_new_node(format_args(args, ft_strndup(str, (size_t)n)), &lst);
+        formater = ft_strndup(str, (size_t)n);
+        if (formater == NULL)
+            return (-1);
+		checker = add_new_node(format_args(args, formater), lst);
 		if (checker == -1)
 			return (-1);
 		str += n;
@@ -108,19 +112,18 @@ int	fill_list(char *str, va_list args, t_list *lst)
 int	ft_printf(const char *str, ...)
 {
 	va_list	args;
-	t_list	**lst;
+	t_list	*lst;
 	int		ret;
 
+    lst = NULL;
 	if (!str)
 		return (-1);
 	if (!(*str))
 		return (0);
-	lst = malloc(sizeof(t_list **));
-	if (lst == NULL)
-		return (-1);
 	va_start(args, str);
-	ret = fill_list((char *)str, args, *lst);
+	ret = fill_list((char *)str, args, &lst);
 	va_end(args);
-	ft_lstfree(lst);
+	ft_lstfree(&lst);
 	return (ret);
 }
+
